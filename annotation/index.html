@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Fail</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+<h1 id="title">Fail</h1>
+
+<video src="https://www.cs.tufts.edu/comp/20/fail.mp4" id="failvideo" controls></video>
+<div id="lyrics"></div>
+
+<script>
+    var video = document.getElementById("failvideo");
+    var lyrics = document.getElementById("lyrics");
+    var timeStamp = 0;
+
+    video.addEventListener("timeupdate", function() {console.log("TIME UPDATED"); timeStamp += 1; console.log("TIMESTAMP: " + timeStamp)}, false);
+</script>
+</body>
+</html>
