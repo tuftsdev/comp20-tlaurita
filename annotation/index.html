@@ -16,9 +16,42 @@
 <script>
     var video = document.getElementById("failvideo");
     var lyrics = document.getElementById("lyrics");
-    var timeStamp = 0;
+    var lyricsObj = {
+        "times": [9, 13, 17, 22, 26, 32, 36, 41, 44, 48, 53, 57, 59, 63, 68, 71],
+        "words": [
+            "You've got me feelin' emotions",
+            "Deeper than I've ever dreamed of",
+            "You've got me feelin' emotions",
+            "Higher than the heavens above",
+            "I feel good, I feel nice",
+            "I've never felt so satisfied",
+            "I'm in love, I'm alive",
+            "Intoxicated, flyin' high",
+            "Feels like a dream",
+            "When you touch me tenderly",
+            "I don't know if it's real",
+            "But I like the way I feel inside",
+            "You've got me feelin' emotions",
+            "Deeper than I've ever dreamed of",
+            "You've got me feelin' emotions",
+            "Higher than the heavens above"
+        ],
+        "updateLyrics": function() {
+            var tempTimes = this.times;
+            var currentTime = video.currentTime;
+            for (var i = 0; i < tempTimes.length; i++) {
+                if (currentTime >= tempTimes[i] && currentTime < tempTimes[i+1]) {
+                    lyrics.innerHTML = this.words[i];
+                }
+            }
+        }
+    }
 
-    video.addEventListener("timeupdate", function() {console.log("TIME UPDATED"); timeStamp += 1; console.log("TIMESTAMP: " + timeStamp)}, false);
+    video.addEventListener("timeupdate", function() {
+        lyricsObj.updateLyrics();
+    }, false);
+
+
 </script>
 </body>
 </html>

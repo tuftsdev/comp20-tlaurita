@@ -1,0 +1,19 @@
+#lyrics {
+    font: italic 36px Helvetica;
+    text-align: center;
+    color: red;
+}
+
+#title {
+    text-align: center;
+    font-size: 48px;
+}
+
+#failvideo {
+    display: block;
+    margin: 0 auto;
+}
+
+body {
+    background-color: 
+}
