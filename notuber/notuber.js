@@ -1,81 +1,102 @@
 // notuber.js
 // Author: Teddy Laurita
 
-notuber = {
-    "username": "nmwMbHID",
-    "http": new XMLHttpRequest(),
-    "url": "https://defense-in-derpth.herokuapp.com/submit",
-    "getPostParams": function() {
-        return "username=" + this.username +
-               "&lat=" + this.latitude +
-               "&lng=" + this.longitude;
-    },
+var username = "nmwMbHID";
 
-    // defaults to Medford MA
-    "latitude": 42.423844,
-    "longitude": -71.109231,
-    "userMarkerURL": "/userMarker.png",
-    "initMap": function() {
-        // Check if browser allows for geolocation
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                this.latitude = position.coords.latitude,
-                this.longitude = position.coords.longitude
-                this.map = new google.maps.Map(document.getElementById("map"), {
-                    center: {lat: this.latitude, lng: this.longitude},
-                    zoom: 14
-                });
-                this.userMarker = new google.maps.Marker({
-                    position: {lat: this.latitude, lng: this.longitude},
-                    map: this.map,
-                    icon: notuber.userMarkerURL
-                });
+var http = new XMLHttpRequest();
+var url = "https://defense-in-derpth.herokuapp.com/submit";
+var userInfoContent = '<div id="userInfo">' + '<p>Username: ' + username + '</p></div>';
+
+var othersMarkers = [];
+var passengerIcon = "passengerMarker.png";
+var vehicleIcon = "black_car.png";
+
+var initMap = function() {
+    // TODO
+    console.log("INSIDE INIT MAP");
+    // Check if browser allows for geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            window.userCoords = new google.maps.LatLng(position.coords.latitude,
+                                                     position.coords.longitude);
+
+            window.map = new google.maps.Map(document.getElementById("map"), {
+                center: userCoords,
+                zoom: 14
             });
-        }
-        else {
-            // if no geolocation, open map on Boston, MA
-            this.map = new google.maps.Map(document.getElementById("map"), {
-                center: {lat: this.latitude, lng: this.longitude},
-                zoom: 8
-              });
-        }
-
-    },
-    "updateLocation": function() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                this.latitude = position.coords.latitude;
-                this.longitude = position.coords.longitude;
+            window.userMarker = new google.maps.Marker({
+                position: userCoords,
+                map: map,
+                icon: "/userMarker.png"
             });
-        }
-        else {
-            document.getElementById("infoPanel").innerHTML =
-                                "Geolocation not supported by this browser";
-        }
-    },
+        });
+    }
+    else {
 
-    "updateMap": function() {
-        // STUB
+        // if no geolocation, open map on Medford, MA
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: new google.maps.LatLng(42.423844, -71.109231),
+            zoom: 14
+        });
+        userMarker = new google.maps.Marker({
+            position: new google.maps.LatLng(42.423844, -71.109231),
+            map: map,
+            icon: "/userMarker.png"
+        });
     }
 }
 
-// event handler for http
-notuber.http.onreadystatechange = function() {
-    if(notuber.http.readyState == 4 && notuber.http.status == 200) {
+// event handler for http state change
+http.onreadystatechange = function() {
+    if (http.readyState == 4 && http.status == 200) {
         // TODO
-        console.log(notuber.http.responseText);
-        notuber.responseText = notuber.http.responseText;
+        console.log(http.responseText);
+        displayOthers(http.responseText);
     }
 }
 
-window.onload = function() {
-    var http = notuber.http;
-    var url = notuber.url;
-    // retrieve other user locations
+// apply function that creates all the markers
+var placeMarkers = function(userObject, iconString) {
+    othersMarkers.push(new google.maps.Marker({
+        position: new google.maps.LatLng(userObject.lat, userObject.lng),
+        map: map,
+        icon: iconString
+    }))
+    return userObject;
+}
+
+// map function that works over JSON returned by POST request
+var mapOthers = function(list, apply, icon) {
+    for (var i = 0; i < list.length; i++) {
+        list[i] = apply(list[i], icon);
+    }
+}
+
+// determines whether to show vehicles or passengers
+var displayOthers = function(responseText) {
+    if (responseText["vehicles"]) {
+        mapOthers(responseText["vehicles"], placeMarkers, vehicleIcon);
+    }
+    else {
+        mapOthers(responseText["passengers"], placeMarkers, passengerIcon);
+    }
+}
+
+// retrieve JSON information about other notuber users
+var retrieveOthers = function() {
     http.open("POST", url, true);
     http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-    http.send(notuber.getPostParams());
+    userParams = "username=" + username +
+                     "&lat=" + userCoords.lat() +
+                     "&lng=" + userCoords.lng();
+    http.send(userParams);
+}
 
-    notuber.updateMap();
+window.onload = function() {
+    // TODO
+    console.log("INSIDE WINDOW ONLOAD");
+    console.log("MAP: " + map);
+    console.log("USER COORDS: " + userCoords);
+    retrieveOthers();
 }
