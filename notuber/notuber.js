@@ -14,6 +14,7 @@ notuber = {
     // defaults to Medford MA
     "latitude": 42.423844,
     "longitude": -71.109231,
+    "userMarkerURL": "/userMarker.png",
     "initMap": function() {
         // Check if browser allows for geolocation
         if (navigator.geolocation) {
@@ -23,6 +24,11 @@ notuber = {
                 this.map = new google.maps.Map(document.getElementById("map"), {
                     center: {lat: this.latitude, lng: this.longitude},
                     zoom: 14
+                });
+                this.userMarker = new google.maps.Marker({
+                    position: {lat: this.latitude, lng: this.longitude},
+                    map: this.map,
+                    icon: notuber.userMarkerURL
                 });
             });
         }
@@ -56,6 +62,7 @@ notuber = {
 // event handler for http
 notuber.http.onreadystatechange = function() {
     if(notuber.http.readyState == 4 && notuber.http.status == 200) {
+        // TODO
         console.log(notuber.http.responseText);
         notuber.responseText = notuber.http.responseText;
     }
