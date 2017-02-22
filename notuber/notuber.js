@@ -1,50 +1,39 @@
 // notuber.js
 // Author: Teddy Laurita
 
-var username = "nmwMbHID";
-
 var http = new XMLHttpRequest();
 var url = "https://defense-in-derpth.herokuapp.com/submit";
 var userInfoContent = '<div id="userInfo">' + '<p>Username: ' + username + '</p></div>';
 
+var username = "nmwMbHID";
 var othersMarkers = [];
+var userIcon = "userMarker.png";
 var passengerIcon = "passengerMarker.png";
 var vehicleIcon = "black_car.png";
 
 var initMap = function() {
-    // TODO
-    console.log("INSIDE INIT MAP");
-    // Check if browser allows for geolocation
+    var defaultLoc = new google.maps.LatLng(42.423844, -71.109231);
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: defaultLoc
+    });
+    userInfoWindow = new google.maps.InfoWindow({map: map});
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            window.userCoords = new google.maps.LatLng(position.coords.latitude,
-                                                     position.coords.longitude);
-
-            window.map = new google.maps.Map(document.getElementById("map"), {
-                center: userCoords,
-                zoom: 14
-            });
-            window.userMarker = new google.maps.Marker({
-                position: userCoords,
-                map: map,
-                icon: "/userMarker.png"
-            });
+            // TODO
+            console.log("INSIDE MAP CREATION GEO FUNC");
+            userCoords = new google.maps.LatLng(position.coords.latitude,
+                                                position.coords.longitude);
+            userInfoWindow.setPosition(userCoords);
+            userInfoWindow.setContent("You are here!\nUsername: " + username);
+            map.setCenter(userCoords);
         });
     }
     else {
-
-        // if no geolocation, open map on Medford, MA
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: new google.maps.LatLng(42.423844, -71.109231),
-            zoom: 14
-        });
-        userMarker = new google.maps.Marker({
-            position: new google.maps.LatLng(42.423844, -71.109231),
-            map: map,
-            icon: "/userMarker.png"
-        });
+        alert("Your browser doesn't support geolocation!");
     }
 }
+
 
 // event handler for http state change
 http.onreadystatechange = function() {
@@ -74,7 +63,9 @@ var mapOthers = function(list, apply, icon) {
 
 // determines whether to show vehicles or passengers
 var displayOthers = function(responseText) {
-    if (responseText["vehicles"]) {
+    // TODO
+    console.log("POST response text: " + responseText);
+    if (responseText["vehicles"] != null) {
         mapOthers(responseText["vehicles"], placeMarkers, vehicleIcon);
     }
     else {
