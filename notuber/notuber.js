@@ -18,14 +18,21 @@ var initMap = function() {
         center: defaultLoc
     });
     userInfoWindow = new google.maps.InfoWindow({map: map});
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            // TODO
-            console.log("INSIDE MAP CREATION GEO FUNC");
             userCoords = new google.maps.LatLng(position.coords.latitude,
                                                 position.coords.longitude);
+            userMarker = new google.maps.Marker({
+                position: userCoords,
+                map: map,
+                icon: userIcon
+            });
             userInfoWindow.setPosition(userCoords);
-            userInfoWindow.setContent("You are here!\nUsername: " + username);
+            userInfoWindow.setContent("<p>You are here!" +
+                                      "<br/>Your Username: " +
+                                      username +
+                                      "</p>");
             map.setCenter(userCoords);
         });
     }
@@ -38,9 +45,7 @@ var initMap = function() {
 // event handler for http state change
 http.onreadystatechange = function() {
     if (http.readyState == 4 && http.status == 200) {
-        // TODO
-        console.log(http.responseText);
-        displayOthers(http.responseText);
+        displayOthers(JSON.parse(http.responseText));
     }
 }
 
@@ -50,7 +55,7 @@ var placeMarkers = function(userObject, iconString) {
         position: new google.maps.LatLng(userObject.lat, userObject.lng),
         map: map,
         icon: iconString
-    }))
+    }));
     return userObject;
 }
 
@@ -63,9 +68,7 @@ var mapOthers = function(list, apply, icon) {
 
 // determines whether to show vehicles or passengers
 var displayOthers = function(responseText) {
-    // TODO
-    console.log("POST response text: " + responseText);
-    if (responseText["vehicles"] != null) {
+    if (responseText["vehicles"] != undefined) {
         mapOthers(responseText["vehicles"], placeMarkers, vehicleIcon);
     }
     else {
@@ -87,7 +90,5 @@ var retrieveOthers = function() {
 window.onload = function() {
     // TODO
     console.log("INSIDE WINDOW ONLOAD");
-    console.log("MAP: " + map);
-    console.log("USER COORDS: " + userCoords);
     retrieveOthers();
 }
