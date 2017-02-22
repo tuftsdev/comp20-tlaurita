@@ -51,11 +51,24 @@ http.onreadystatechange = function() {
 
 // apply function that creates all the markers
 var placeMarkers = function(userObject, iconString) {
-    othersMarkers.push(new google.maps.Marker({
-        position: new google.maps.LatLng(userObject.lat, userObject.lng),
-        map: map,
-        icon: iconString
-    }));
+    var userLocation = new google.maps.LatLng(userObject.lat,
+                                              userObject.lng);
+    var otherObj = {
+        "location": userLocation,
+        "marker": new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    icon: iconString
+        }),
+        "infoWindow": new google.maps.InfoWindow({
+            content: "<p>Username: " + userObject.username + "</p>"
+        })
+    };
+    otherObj.marker.addListener('click', function() {
+        otherObj.infoWindow.open(map, otherObj.marker);
+    });
+    othersMarkers.push(otherObj);
+
     return userObject;
 }
 
@@ -69,10 +82,10 @@ var mapOthers = function(list, apply, icon) {
 // determines whether to show vehicles or passengers
 var displayOthers = function(responseText) {
     if (responseText["vehicles"] != undefined) {
-        mapOthers(responseText["vehicles"], placeMarkers, vehicleIcon);
+        mapOthers(responseText.vehicles, placeMarkers, vehicleIcon);
     }
     else {
-        mapOthers(responseText["passengers"], placeMarkers, passengerIcon);
+        mapOthers(responseText.passengers, placeMarkers, passengerIcon);
     }
 }
 
