@@ -1,6 +1,8 @@
 // notuber.js
 // Author: Teddy Laurita
 
+const METERS_TO_MILES = 1609
+
 var http = new XMLHttpRequest();
 var url = "https://defense-in-derpth.herokuapp.com/submit";
 var userInfoContent = '<div id="userInfo">' + '<p>Username: ' + username + '</p></div>';
@@ -33,6 +35,9 @@ var initMap = function() {
                                       "<br/>Your Username: " +
                                       username +
                                       "</p>");
+            userMarker.addListener('click', function() {
+                userInfoWindow.open(map, userMarker);
+            });
             map.setCenter(userCoords);
         });
     }
@@ -51,17 +56,28 @@ http.onreadystatechange = function() {
 
 // apply function that creates all the markers
 var placeMarkers = function(userObject, iconString) {
-    var userLocation = new google.maps.LatLng(userObject.lat,
+    var otherLocation = new google.maps.LatLng(userObject.lat,
                                               userObject.lng);
+    var distanceBetween = google.maps.geometry.spherical.computeDistanceBetween(
+                                                        userCoords,
+                                                        otherLocation);
+    // TODO
+    console.log("DISTANCE BETWEEN: " + distanceBetween);
     var otherObj = {
-        "location": userLocation,
+        "milesFromUser":distanceBetween,
+        "location": otherLocation,
         "marker": new google.maps.Marker({
-                    position: userLocation,
+                    position: otherLocation,
                     map: map,
                     icon: iconString
         }),
         "infoWindow": new google.maps.InfoWindow({
-            content: "<p>Username: " + userObject.username + "</p>"
+            content: "<p>Username: " +
+                     userObject.username +
+                     "</br>" +
+                     "Distance from you (miles): " +
+                     (distanceBetween / METERS_TO_MILES).toFixed(2) +
+                     "</p>"
         })
     };
     otherObj.marker.addListener('click', function() {
@@ -101,7 +117,5 @@ var retrieveOthers = function() {
 }
 
 window.onload = function() {
-    // TODO
-    console.log("INSIDE WINDOW ONLOAD");
     retrieveOthers();
 }
