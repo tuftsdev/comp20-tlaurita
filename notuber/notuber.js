@@ -4,7 +4,8 @@
 const METERS_TO_MILES = 1609
 
 var http = new XMLHttpRequest();
-var url = "https://defense-in-derpth.herokuapp.com/submit";
+// Added personal heroku app url
+var url = "https://vast-coast-45749.herokuapp.com/submit";
 var userInfoContent = '<div id="userInfo">' + '<p>Username: ' + username + '</p></div>';
 
 var username = "nmwMbHID";
@@ -61,8 +62,6 @@ var placeMarkers = function(userObject, iconString) {
     var distanceBetween = google.maps.geometry.spherical.computeDistanceBetween(
                                                         userCoords,
                                                         otherLocation);
-    // TODO
-    console.log("DISTANCE BETWEEN: " + distanceBetween);
     var otherObj = {
         "milesFromUser":distanceBetween,
         "location": otherLocation,
